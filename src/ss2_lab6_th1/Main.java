@@ -70,12 +70,17 @@ public class Main {
                         main.displayData();
                         break;
                     case 2:
-
+                        main.addNewStudent(scan);
                         break;
 
                     case 3:
+                        stmt = conn.createStatement();
+                        String query = "INSERT INTO tblsinhvien " + "VALUES('C1505004','Chu du','Ngo quoc','0123456789',1)";
+                        //stmt.executeUpdate("INSERT INTO tblsinhvien " +    "VALUES (1004, 'Cramden', 'Mr.', 'New York', 2001)");
+                        stmt.executeUpdate(query);
                         break;
                     case 4:
+                        main.lastIndex();
                         break;
                     case 5:
 
@@ -227,7 +232,8 @@ public class Main {
         System.out.println("Nhap ma sv:");
         String regexRoll = "^C[0-9]{1,14}$";
         Pattern patternRoll = Pattern.compile(regexRoll);
-        String rollNumber, studentName, address,phone,gender;
+        String rollNumber, studentName, address, phone;
+        int gender;
         do {
 
             rollNumber = scan.nextLine().trim();
@@ -247,9 +253,9 @@ public class Main {
         System.out.println("Nhap ten sv: ");
         do {
             studentName = scan.nextLine().trim();
-            if(studentName.length()>0&&studentName.length()<=50){
+            if (studentName.length() > 0 && studentName.length() <= 50) {
                 break;
-            }else{
+            } else {
                 System.err.println("Ten sinh vien khong qua 50 ky tu! Vui long nhap lai!");
             }
         } while (true);
@@ -257,28 +263,56 @@ public class Main {
         System.out.println("Nhap dia chi sinh vien");
         do {
             address = scan.nextLine().trim();
-            if(address.length()>0&&address.length()<=200){
+            if (address.length() > 0 && address.length() <= 200) {
                 break;
-            }else{
+            } else {
                 System.err.println("Ten sinh vien khong qua 50 ky tu! Vui long nhap lai!");
             }
         } while (true);
         System.out.println("Nhap so dien thoai sinh vien: ");
-         String regexPhone = "^0[1-9]{9,10}$";
+        String regexPhone = "^0[1-9]{9,10}$";
         Pattern patternPhone = Pattern.compile(regexPhone);
-        do {      
-          phone = scan.nextLine();
+        do {
+            phone = scan.nextLine();
             Matcher matcherPhone = patternPhone.matcher(phone);
-            if(matcherPhone.matches()){
-                 break;
-            }else{
+            if (matcherPhone.matches()) {
+                break;
+            } else {
                 System.err.println("So dien thoai khong dung dinh dang!");
                 System.err.println("Vui long nhap lai theo mau 0xxxxxxxx voi x la cac so tu 0-9 va x nam trong khoang tu 9 den 10 so");
             }
-           
+
         } while (true);
-        String query = "insert into tblsinhvien values("+rollNumber+","+studentName+","+address+","+phone+",?)";
-        stmt.executeQuery(query);
+        System.out.println("Nhap gioi tinh cho sinh vien");
+        System.out.println(" 1 neu la nam ");
+        System.out.println(" 0 neu la nu");
+        do {
+
+            try {
+                int intGender = Integer.parseInt(scan.nextLine());
+                if (intGender == 1 || intGender == 0) {
+                    gender = intGender;
+                    break;
+                } else {
+                    System.err.println("Gender chi nhan 0 hoac 1! Vui long nhap lai!");
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Vui long nhap vao 1 so nguyen 1 hoac 0!");
+            }
+
+        } while (true);
+        String query = "INSERT INTO tblsinhvien VALUES(" + rollNumber + "," + studentName + "," + address + "," + phone + "," + gender + ")";
+        System.out.println(query);
+        stmt.executeUpdate(query);
+        System.out.println("Da them moi 1 sinh vien!");
     }
 
+    public void lastIndex() throws SQLException {
+        stmt = conn.createStatement();
+       rs = stmt.executeQuery("select id from tblsinhvien ORDER BY id DESC LIMIT 1");
+      while(rs.next()){
+           System.out.println(rs.getInt(1));
+      }
+       
+    }
 }
