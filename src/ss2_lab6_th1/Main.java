@@ -74,10 +74,7 @@ public class Main {
                         break;
 
                     case 3:
-                        stmt = conn.createStatement();
-                        String query = "INSERT INTO tblsinhvien " + "VALUES('C1505004','Chu du','Ngo quoc','0123456789',1)";
-                        //stmt.executeUpdate("INSERT INTO tblsinhvien " +    "VALUES (1004, 'Cramden', 'Mr.', 'New York', 2001)");
-                        stmt.executeUpdate(query);
+                        main.updateStudent(scan);
                         break;
                     case 4:
                         main.lastIndex();
@@ -214,10 +211,10 @@ public class Main {
         rs = stmt.executeQuery("select * from tblsinhvien");
         while (rs.next()) {
             if (rs.isFirst()) {
-                System.out.printf("%-5s %-10s %-20s %-20s %-20s \n", "Stt", "Ma SV", "Ten", "Dia chi", "Phone");
-                System.out.printf("%-5d %-10s %-20s %-20s %-20s \n", rs.getInt(1), rs.getString(2), rs.getNString(3), rs.getNString(4), rs.getString(5));
+                System.out.printf("%-5s %-10s %-20s %-20s %-20s %-10s \n", "Stt", "Ma SV", "Ten", "Dia chi", "Phone", "Gioi tinh");
+                System.out.printf("%-5d %-10s %-20s %-20s %-20s %-10s\n", +rs.getInt("id"), rs.getString("rollNumber"), rs.getNString("name"), rs.getNString("address"), rs.getString("phoneNumber"), (rs.getInt("gender") == 1) ? "Nam" : "Nu");
             } else {
-                System.out.printf("%-5d %-10s %-20s %-20s %-20s \n", rs.getInt(1), rs.getString(2), rs.getNString(3), rs.getNString(4), rs.getString(5));
+                System.out.printf("%-5d %-10s %-20s %-20s %-20s %-10s \n", +rs.getInt("id"), rs.getString("rollNumber"), rs.getNString("name"), rs.getNString("address"), rs.getString("phoneNumber"), (rs.getInt("gender") == 1) ? "Nam" : "Nu");
             }
         }
     }
@@ -301,18 +298,125 @@ public class Main {
             }
 
         } while (true);
-        String query = "INSERT INTO tblsinhvien VALUES(" + rollNumber + "," + studentName + "," + address + "," + phone + "," + gender + ")";
+        int id = lastIndex();
+        String query = "INSERT INTO tblsinhvien VALUES(" + id + ", ' " + rollNumber + " ',' " + studentName + " ',' " + address + " ',' " + phone + " '," + gender + ")";
         System.out.println(query);
         stmt.executeUpdate(query);
         System.out.println("Da them moi 1 sinh vien!");
     }
 
-    public void lastIndex() throws SQLException {
+    public void updateStudent(Scanner scan) throws SQLException {
         stmt = conn.createStatement();
-       rs = stmt.executeQuery("select id from tblsinhvien ORDER BY id DESC LIMIT 1");
-      while(rs.next()){
-           System.out.println(rs.getInt(1));
-      }
-       
+        System.out.println("Nhap ma sinh vien can sua: ");
+        int updateId = 0;
+        do {
+            try {
+                updateId = Integer.parseInt(scan.nextLine());
+                if (updateId > 0) {
+                    break;
+                }
+            } catch (Exception e) {
+            }
+        } while (true);
+        System.out.println("Nhap ma sv:");
+        String regexRoll = "^C[0-9]{1,14}$";
+        Pattern patternRoll = Pattern.compile(regexRoll);
+        String rollNumber1, studentName1, address1, phone1;
+        int gender1;
+        do {
+
+            rollNumber1 = scan.nextLine().trim();
+            if (rollNumber1 == null) {
+                System.err.println("Ma sinh vien khong duoc de trong!");
+            } else {
+                Matcher mathRoll = patternRoll.matcher(rollNumber1);
+                if (mathRoll.matches()) {
+
+                    break;
+                } else {
+                    System.err.println("Ma sinh vien co kieu la Cxxxxxxx voi x la cac so tu 0-9! Vui long nhap lai!");
+                }
+            }
+
+        } while (true);
+        System.out.println("Nhap ten sv: ");
+        do {
+            studentName1 = scan.nextLine().trim();
+            if (studentName1.length() > 0 && studentName1.length() <= 50) {
+                break;
+            } else {
+                System.err.println("Ten sinh vien khong qua 50 ky tu! Vui long nhap lai!");
+            }
+        } while (true);
+
+        System.out.println("Nhap dia chi sinh vien");
+        do {
+            address1 = scan.nextLine().trim();
+            if (address1.length() > 0 && address1.length() <= 200) {
+                break;
+            } else {
+                System.err.println("Ten sinh vien khong qua 50 ky tu! Vui long nhap lai!");
+            }
+        } while (true);
+        System.out.println("Nhap so dien thoai sinh vien: ");
+        String regexPhone = "^0[1-9]{9,10}$";
+        Pattern patternPhone = Pattern.compile(regexPhone);
+        do {
+            phone1 = scan.nextLine();
+            Matcher matcherPhone = patternPhone.matcher(phone1);
+            if (matcherPhone.matches()) {
+                break;
+            } else {
+                System.err.println("So dien thoai khong dung dinh dang!");
+                System.err.println("Vui long nhap lai theo mau 0xxxxxxxx voi x la cac so tu 0-9 va x nam trong khoang tu 9 den 10 so");
+            }
+
+        } while (true);
+        System.out.println("Nhap gioi tinh cho sinh vien");
+        System.out.println(" 1 neu la nam ");
+        System.out.println(" 0 neu la nu");
+        do {
+
+            try {
+                int intGender = Integer.parseInt(scan.nextLine());
+                if (intGender == 1 || intGender == 0) {
+                    gender1 = intGender;
+                    break;
+                } else {
+                    System.err.println("Gender chi nhan 0 hoac 1! Vui long nhap lai!");
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Vui long nhap vao 1 so nguyen 1 hoac 0!");
+            }
+
+        } while (true);
+        int id = lastIndex();
+        String query = "UPDATE  tblsinhvien SET " +
+                "rollNumber ='"+rollNumber1+"', "+
+                 "name ='"+studentName1+ "',"+
+                 "address ='"+address1+"',"+
+                 "phoneNumber ='"+phone1+"', "+
+                 "gender ="+gender1+" WHERE id ="+updateId ;
+                
+        
+        int check=stmt.executeUpdate(query);
+        if(check>0){
+            System.out.println("Da sua thanh cong! ");
+        }else{
+            System.out.println("Khong tim thay ban ghi");
+        }
+    }
+
+    public static int lastIndex() throws SQLException {
+        int number = 0;
+        stmt = conn.createStatement();
+        rs = stmt.executeQuery("select id from tblsinhvien ORDER BY id DESC LIMIT 1");
+        while (rs.next()) {
+            System.out.println(rs.getInt(1));
+            number = rs.getInt("id") + 1;
+
+        }
+        return number;
+
     }
 }
