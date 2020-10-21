@@ -227,9 +227,10 @@ public class Main {
         System.out.println("Nhap ma sv:");
         String regexRoll = "^C[0-9]{1,14}$";
         Pattern patternRoll = Pattern.compile(regexRoll);
+        String rollNumber, studentName, address,phone,gender;
         do {
 
-            String rollNumber = scan.nextLine().trim();
+            rollNumber = scan.nextLine().trim();
             if (rollNumber == null) {
                 System.err.println("Ma sinh vien khong duoc de trong!");
             } else {
@@ -245,7 +246,7 @@ public class Main {
         } while (true);
         System.out.println("Nhap ten sv: ");
         do {
-            String studentName = scan.nextLine().trim();
+            studentName = scan.nextLine().trim();
             if(studentName.length()>0&&studentName.length()<=50){
                 break;
             }else{
@@ -255,7 +256,7 @@ public class Main {
 
         System.out.println("Nhap dia chi sinh vien");
         do {
-           String address = scan.nextLine().trim();
+            address = scan.nextLine().trim();
             if(address.length()>0&&address.length()<=200){
                 break;
             }else{
@@ -263,10 +264,20 @@ public class Main {
             }
         } while (true);
         System.out.println("Nhap so dien thoai sinh vien: ");
-        do {            
-            break;
+         String regexPhone = "^0[1-9]{9,10}$";
+        Pattern patternPhone = Pattern.compile(regexPhone);
+        do {      
+          phone = scan.nextLine();
+            Matcher matcherPhone = patternPhone.matcher(phone);
+            if(matcherPhone.matches()){
+                 break;
+            }else{
+                System.err.println("So dien thoai khong dung dinh dang!");
+                System.err.println("Vui long nhap lai theo mau 0xxxxxxxx voi x la cac so tu 0-9 va x nam trong khoang tu 9 den 10 so");
+            }
+           
         } while (true);
-        String query = "insert into tblsinhvien values(?,?,?,?,?)";
+        String query = "insert into tblsinhvien values("+rollNumber+","+studentName+","+address+","+phone+",?)";
         stmt.executeQuery(query);
     }
 
